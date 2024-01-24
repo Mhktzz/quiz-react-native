@@ -5,16 +5,17 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import axios from "axios";
-import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for icons
 
 export default function App() {
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const getQuizzes = async () => {
     try {
-      const url = "https://f14a-125-160-96-116.ngrok-free.app/api/quizzes"; // Setiap link ketika ngrok di-run ulang berbeda-beda. Pastikan ketika men-run ulang ngrok perbarui link yang ter-generate.
+      const url = "https://53b2-182-2-77-140.ngrok-free.app/api/quizzes";
       const headers = {
         "ngrok-skip-browser-warning": "true",
       };
@@ -22,8 +23,10 @@ export default function App() {
       const response = await axios.get(url, { headers });
 
       setData(response.data);
+      setLoading(false);
     } catch (error) {
       console.log("Error fetching data:", error);
+      setLoading(false);
     }
   };
 
@@ -31,7 +34,7 @@ export default function App() {
     getQuizzes();
   }, []);
 
-  const renderQuizItem2 = ({ item }) => {
+  const renderQuizItem = ({ item }) => {
     return (
       <View style={{ flex: 1 }}>
         <Text style={styles.quizContainer}>
@@ -64,21 +67,14 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>Quiz Bank</Text>
-      <View
-        style={{
-          height: 2,
-          backgroundColor: "#21496B",
-          marginLeft: 10,
-          marginRight: 20,
-          marginBottom: 10,
-        }}
-      ></View>
-
-      {data && data.length > 0 ? (
+      <View style={styles.line} />
+      {loading ? (
+        <ActivityIndicator size="large" color="#ffffff" />
+      ) : data && data.length > 0 ? (
         <FlatList
           data={data}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={renderQuizItem2}
+          renderItem={renderQuizItem}
         />
       ) : (
         <View
@@ -115,8 +111,16 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 16,
     marginLeft: 10,
-    textAlign: "flex-start",
+    textAlign: "left",
     color: "#98A3CB",
+  },
+
+  line: {
+    height: 2,
+    backgroundColor: "#21496B",
+    marginLeft: 10,
+    marginRight: 20,
+    marginBottom: 10,
   },
 
   quizContainer: {
